@@ -12,8 +12,6 @@ IRsend irsend;
 
 decode_results results;
 
-String infraredSensor = "";
-
 void setup()
 {
   Serial.begin(9600);
@@ -24,13 +22,17 @@ void setup()
 void loop()
 {
   sensors();
-  delay(1000);
+  delay(1200);
 }
 
 void sensors() {
   sendMessage("temperature", calculateTemperature());
   sendMessage("luminosity", calculateLuminosity());
-  sendMessage("infrared", decodeInfrared());
+
+  String infraredSensor = decodeInfrared();
+  if(infraredSensor.length() > 0) {
+    sendMessage("infrared", infraredSensor);
+  }
 }
 
 double calculateTemperature() {
@@ -53,11 +55,13 @@ double calculateLuminosity() {
 }
 
 String decodeInfrared() {
+  String infraredSensor = "";
+
   if (irrecv.decode(&results)) {
     infraredSensor = String(results.value, HEX);
     irrecv.resume();
   }
-  
+
   return infraredSensor;
 }
 
@@ -86,7 +90,7 @@ void sendMessage(String topic, String value) {
 void serialEvent() {
   while (Serial.available()) {
     String rawMessage = Serial.readString();
-    
+
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& message = jsonBuffer.parseObject(rawMessage);
 
