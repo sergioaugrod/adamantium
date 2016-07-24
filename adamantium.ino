@@ -22,12 +22,13 @@ void setup()
 void loop()
 {
   sensors();
-  delay(1200);
 }
 
 void sensors() {
   sendMessage("temperature", calculateTemperature());
+  delay(600);
   sendMessage("luminosity", calculateLuminosity());
+  delay(600);
 
   String infraredSensor = decodeInfrared();
   if(infraredSensor.length() > 0) {
